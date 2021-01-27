@@ -19,18 +19,29 @@ function refresh(inputData){
 }
 
 function downloadDataFromServer(){
-	fetch('/api/get-list').then(function(response){
+	var listTableBody = document.getElementById('list-table-body');
+	listTableBody.innerHTML = `<tr><td colspan=3>Please wait... Loading....</td></tr>`;
+	fetch(`/api/get-list?time=${Date.now()}`).then(function(response){
 		if(response.ok){
 			response.json().then(function(data){
 				refresh(data);
 			});
 		} else {
-			console.log('Somethin went wrong...');
+			// console.log('Somethin went wrong...');
 		}
+	}).catch(function(error){
+			// console.log('Somethin went wrong...', error);
+			listTableBody.innerHTML = `<tr><td colspan=3><div class="error">Network Error (await 5 sec...)</div></td></tr>`;
 	});
 }
 
 window.onload = function(){
-	document.getElementById('list-table-body').innerHTML=`<tr><td colspan=3>Please wait... Loading....</td></tr>`;
 	downloadDataFromServer();
+	setInterval(function(){
+		var listTableBody = document.getElementById('list-table-body');
+		listTableBody.innerHTML = `<tr><td colspan=3>...</td></tr>`;
+		setTimeout(function(){
+			downloadDataFromServer();
+		}, 1000);
+	}, 4000);
 };

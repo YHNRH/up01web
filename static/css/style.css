@@ -44,3 +44,8 @@ body {
 #table-menu .c3 {
 	text-align: center;
 }
+
+div.error {
+	color: red;
+	font-weight: bold;
+}

@@ -1,12 +1,12 @@
 function start(response) {
 
 	// console.log('CALL function csCB');
-	response.writeHead(200, {"Content-Type": "text/html"});
+	// response.writeHead(200, {"Content-Type": "text/html"});
 
 	var usersList = {}
-	usersList['Palchikov'] = '3ISIP-18-1';
-	usersList['Nikitin']   = '3ISIP-18-1';
-	usersList['Kazakov']   = '3ISIP-18-1';
+	usersList['Palchikov123'] = '3ISIP-18-1';
+	usersList['Nikitin456']   = '3ISIP-18-1';
+	usersList['Kazakov789']   = '3ISIP-18-1';
 
 	response.write("<table>");
 	var keys = Object.keys(usersList);

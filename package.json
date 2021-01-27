@@ -16,5 +16,8 @@
   "license": "ISC",
   "devDependencies": {
     "http-server": "^0.12.3"
+  },
+  "dependencies": {
+    "node-static": "^0.7.11"
   }
 }

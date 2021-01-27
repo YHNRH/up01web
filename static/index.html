@@ -12,7 +12,7 @@
 	<tbody>
 		<tr>
 			<td>Вы вошли как: <b>Вася</b></td>
-			<td id="btn-col"><button>Выход</button></td>
+			<td id="btn-col"><button onclick="onClickButton()">Выход</button></td>
 		</tr>
 	</tbody>
 </table>
@@ -27,22 +27,8 @@
 			<th class="c3">Скачать</th>
 		</tr>
 	</thead>
-	<tbody>
-		<tr>
-			<td class="c1"><input type="checkbox" checked="checked" name="" title="выберите для действия"></td>
-			<td>Рис. 1</td>
-			<td class="c3"><button>Скачать</button></td>
-		</tr>
-		<tr>
-			<td class="c1"><input type="checkbox" name="" title="выберите для действия"></td>
-			<td>Рис. 2</td>
-			<td class="c3"><button>Скачать</button></td>
-		</tr>
-		<tr>
-			<td class="c1"><input type="checkbox" checked="checked" name="" title="выберите для действия"></td>
-			<td>Рис. 3</td>
-			<td class="c3"><button>Скачать</button></td>
-		</tr>
+	<tbody id="list-table-body">
+		
 	</tbody>
 </table>
 
@@ -66,7 +52,6 @@
 		</tr>
 	</tbody>
 </table>
-
 
 </body>
 </html>

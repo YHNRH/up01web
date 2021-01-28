@@ -16,5 +16,10 @@
   "license": "ISC",
   "devDependencies": {
     "http-server": "^0.12.3"
+  },
+  "dependencies": {
+    "mariadb": "^2.5.2",
+    "node-static": "^0.7.11",
+    "sequelize": "^6.5.0"
   }
 }

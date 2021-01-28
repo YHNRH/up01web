@@ -37,11 +37,11 @@ function downloadDataFromServer(){
 
 window.onload = function(){
 	downloadDataFromServer();
-	setInterval(function(){
+	/*setInterval(function(){
 		var listTableBody = document.getElementById('list-table-body');
 		listTableBody.innerHTML = `<tr><td colspan=3>...</td></tr>`;
 		setTimeout(function(){
 			downloadDataFromServer();
 		}, 1000);
-	}, 4000);
+	}, 4000);*/
 };

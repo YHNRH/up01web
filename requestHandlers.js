@@ -48,19 +48,27 @@ function getList(request, response){
 }
 
 function create(request, response){
-	
-	Item.create({
-		title: 'title1',
-		filepath: '/home/user/server/images'
-	}).then(function(okData){
-		console.log(`okData ${okData}`);
-	}).catch(function(errData){
-		console.log(`errData ${errData}`);
+	var body = [];
+	request.on('data', function(chunk) {
+		body.push(chunk);
+	}).on('end', function() {
+		body = body.join('');
+		var dataJSON = JSON.parse(body);
+		console.log('request?', dataJSON);
+
+		Item.create({
+			title: dataJSON.title,
+			filepath: dataJSON.filepath
+		}).then(function(okData) {
+			console.log(`result?`, okData);
+			response.writeHead(200, {"Content-Type": "application/json"});
+			response.end();
+		}).catch(function(errData) {
+			console.log('ERROR!!!111', errData);
+			response.writeHead(503, {"Content-Type": "application/json"});
+			response.end();
+		});
 	});
-
-	response.writeHead(200, {"Content-Type": "application/json"});
-	response.end();
-
 }
 
 exports.getList = getList;

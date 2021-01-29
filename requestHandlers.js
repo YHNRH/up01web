@@ -54,7 +54,6 @@ function create(request, response){
 	}).on('end', function() {
 		body = body.join('');
 		var dataJSON = JSON.parse(body);
-		console.log('request?', dataJSON);
 
 		Item.create({
 			title: dataJSON.title,
@@ -64,12 +63,40 @@ function create(request, response){
 			response.writeHead(200, {"Content-Type": "application/json"});
 			response.end();
 		}).catch(function(errData) {
-			console.log('ERROR!!!111', errData);
+			console.log('ERROR', errData);
 			response.writeHead(503, {"Content-Type": "application/json"});
+			var error = {
+				message: errData
+			};
+			response.write(JSON.stringify(error));
 			response.end();
 		});
 	});
 }
 
+/**
+ * Функция обработки операции удаления записи из БД.
+ */
+function remove(request, response) {
+	var body = [];
+	request.on('data', function(chunk) {
+		body.push(chunk);
+	}).on('end', function() {
+		body = body.join('');
+		var dataJSON = JSON.parse(body);
+		console.log('DATA', dataJSON);
+		dataJSON.forEach(function(id) {
+			Item.destroy({
+				where: {
+					id: id
+				}
+			})
+		});
+		response.writeHead(204, {"Content-Type": "application/json"});
+		response.end();
+	});
+}
+
 exports.getList = getList;
-exports.create = create;
+exports.create  = create;
+exports.remove  = remove;

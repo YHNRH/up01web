@@ -16,7 +16,8 @@ function start(route, handle){
 	var port = 8888;
 	http.createServer(onRequest).listen(port);
 	console.log(`Server started on port ${port}`);
-	//console.log('Server started on port ' + port.toString();
+	// console.log('Hello, nodemon!');
+	// console.log('Server started on port ' + port.toString();
 }
 
 exports.start = start;

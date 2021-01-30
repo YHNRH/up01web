@@ -178,16 +178,24 @@ function create(request, response){
  */
 function remove(request, response) {
 	readDataFromRequest(request, function (dataJSON) {
-		console.log('DATA', dataJSON);
-		dataJSON.forEach(function(id) {
-			Item.destroy({
-				where: {
-					id: id
-				}
-			})
-		});
-		response.writeHead(204, {"Content-Type": "application/json"});
-		response.end();
+		authorize(dataJSON.token, function(userId) {
+				console.log('DATA', dataJSON);
+				var ids = dataJSON.ids;
+				ids.forEach(function(id) {
+					Item.destroy({
+						where: {
+							id: id
+						}
+					})
+				});
+				response.writeHead(204, {"Content-Type": "application/json"});
+				response.end();
+			},
+			function(error) {
+				response.writeHead(401, { "Content-Type": "application/json" });
+				response.write(JSON.stringify({ error: error }));
+				response.end();
+			});
 	});
 }
 

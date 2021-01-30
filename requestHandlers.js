@@ -223,9 +223,58 @@ function register(request, response) {
 	});
 }
 
+function auth(request, response) {
+	var body = [];
+	request.on('data', function(chunk) {
+		body.push(chunk);
+	}).on('end', function() {
+		body = body.join('');
+		var dataJSON = JSON.parse(body);
+
+		User.findAll({
+			where: {
+				login: dataJSON.login,
+				pass:  dataJSON.password
+			}
+		}).then(function(users) {
+			if (users.length > 0) {
+				var userId   = users[0].dataValues.id;
+				var login    = users[0].dataValues.login;
+				var tokenTTL = 60; // min
+				var today    = Date.now();
+				var expire   = today + tokenTTL * 60 * 1000;
+				Token.create({
+					userId: userId,
+					expire: expire
+				}).then(function(okData) {
+					response.writeHead(201, {"Content-Type": "application/json"});
+					response.write(JSON.stringify({ login : login, token : okData.dataValues.id }));
+					response.end();
+				}).catch(function(errData) {
+					response.writeHead(503, {"Content-Type": "application/json"});
+					var error = {
+						message: errData
+					};
+					response.write(JSON.stringify(error));
+					response.end();
+				});
+			} else {
+				response.writeHead(401, {"Content-Type": "application/json"});
+				response.write(JSON.stringify({ message: "Wrong login or password." }));
+				response.end();
+			}
+		}).catch(function(err){
+			console.log(`err? ${err}`);
+			response.write(JSON.stringify({ message: "Database error." }));
+			response.end();
+		})
+	});
+}
+
 exports.getList  = getList;
 exports.create   = create;
 exports.remove   = remove;
 exports.register = register;
+exports.auth     = auth;
 exports.authCreateTestData = authCreateTestData;
 exports.authRemoveTestData = authRemoveTestData;

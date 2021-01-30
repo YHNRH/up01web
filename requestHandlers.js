@@ -94,18 +94,26 @@ function getList(request, response){
 	})
 }
 
-
 /**
- * Функция обработки операции добавления записи в БД.
+ * Функция для чтения данных из запроса и преобразования их в JSON.
+ * 'callback' вызывается с одним параметром: данными в JSON.
  */
-function create(request, response){
+function readDataFromRequest(request, callback) {
 	var body = [];
 	request.on('data', function(chunk) {
 		body.push(chunk);
 	}).on('end', function() {
 		body = body.join('');
 		var dataJSON = JSON.parse(body);
+		callback(dataJSON);
+	});
+}
 
+/**
+ * Функция обработки операции добавления записи в БД.
+ */
+function create(request, response){
+	readDataFromRequest(request, function(dataJSON) {
 		Item.create({
 			title: dataJSON.title,
 			filepath: dataJSON.filepath
@@ -129,12 +137,7 @@ function create(request, response){
  * Функция обработки операции удаления записи из БД.
  */
 function remove(request, response) {
-	var body = [];
-	request.on('data', function(chunk) {
-		body.push(chunk);
-	}).on('end', function() {
-		body = body.join('');
-		var dataJSON = JSON.parse(body);
+	readDataFromRequest(request, function (dataJSON) {
 		console.log('DATA', dataJSON);
 		dataJSON.forEach(function(id) {
 			Item.destroy({
@@ -149,12 +152,7 @@ function remove(request, response) {
 }
 
 function register(request, response) {
-	var body = [];
-	request.on('data', function(chunk) {
-		body.push(chunk);
-	}).on('end', function() {
-		body = body.join('');
-		var dataJSON = JSON.parse(body);
+	readDataFromRequest(request, function(dataJSON) {
 		User.create({
 			login:  dataJSON.login,
 			pass:   dataJSON.password,
@@ -172,13 +170,7 @@ function register(request, response) {
 }
 
 function login(request, response) {
-	var body = [];
-	request.on('data', function(chunk) {
-		body.push(chunk);
-	}).on('end', function() {
-		body = body.join('');
-		var dataJSON = JSON.parse(body);
-
+	readDataFromRequest(request, function(dataJSON) {
 		User.findAll({
 			where: {
 				login: dataJSON.login,
@@ -220,12 +212,7 @@ function login(request, response) {
 }
 
 function logout(request, response) {
-	var body = [];
-	request.on('data', function(chunk) {
-		body.push(chunk);
-	}).on('end', function() {
-		body = body.join('');
-		var dataJSON = JSON.parse(body);
+	readDataFromRequest(request, function (dataJSON) {
 		var token = dataJSON.token;
 		Token.findAll({
 			where : {

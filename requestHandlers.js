@@ -67,31 +67,60 @@ Token.sync(); // { force: true }
  * Token Model - end
  */
 
+/**
+ * Функция авторизации пользователя.
+ * successCallback вызывается при успешной авторизации с ID пользователя.
+ * errorCallback   вызывается при ошибке авторизации с описанием ошибки в виде строки.
+ */
+function authorize(token, successCallback, errorCallback) {
+	console.log("token?", token);
+	if (token == undefined) {
+		errorCallback("Not authorized");
+	} else {
+	 	Token.findAll({
+			where : {
+				id: token
+			}
+		}).then(function (tokens) {
+			if (tokens.length > 0) {
+				successCallback(tokens[0].dataValues.userId);
+			} else {
+				errorCallback("Not authorized");
+			}
+		}).catch(function (error) {
+			errorCallback("Database error");
+		});
+	}
+}
+
 
 /**
  * getting list items from database and return it as JSON to frontend 
  */
 function getList(request, response){
-
-	/*if(request.headers.token!='qwerty'){
-		response.writeHead(401, {"Content-Type": "application/json"});
-		response.write('{"status": "unauthorized"}');
-		response.end();
-		return;
-	}*/
-
-	Item.findAll({}).then(function(data) {
-		var result = [];
-		data.forEach(function (e) {
-			result.push({ id: e.id, title: e.title, filepath: e.filepath });
+	readDataFromRequest(request, function(dataJSON) {
+		authorize(dataJSON.token, function(userId) {
+			Item.findAll({}).then(function(data) {
+				var result = [];
+				data.forEach(function (e) {
+					result.push({ id: e.id, title: e.title, filepath: e.filepath });
+				});
+				var dataJSON = JSON.stringify(result);
+				response.writeHead(200, { "Content-Type": "application/json" });
+				response.write(dataJSON);
+				response.end();
+			}).catch(function(err){
+				console.log(`err? ${err}`);
+				response.writeHead(503, { "Content-Type": "application/json" });
+				response.end();
+			});
+		},
+		function (error) {
+				response.writeHead(401, { "Content-Type": "application/json" });
+				response.write(JSON.stringify({ error: error }));
+				response.end();
 		});
-		var dataJSON = JSON.stringify(result);
-		response.writeHead(200, { "Content-Type": "application/json" });
-		response.write(dataJSON);
-		response.end();
-	}).catch(function(err){
-		console.log(`err? ${err}`);
-	})
+	});
 }
 
 /**

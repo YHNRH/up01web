@@ -3,6 +3,8 @@ let { Sequelize, Model, DataTypes } = require('sequelize');
 let sequelize = new Sequelize('db', 'user', '123456', 
 	{ host: 'localhost', dialect: 'mariadb' });
 
+let fs = require('fs');
+
 /**
  * Item Model - begin
  */
@@ -148,22 +150,41 @@ function readDataFromRequest(request, callback) {
 function create(request, response){
 	readDataFromRequest(request, function(dataJSON) {
 		authorize(dataJSON.token, function(userId) {
-				Item.create({
-					title: dataJSON.title,
-					filepath: dataJSON.filepath
-				}).then(function(okData) {
-					console.log(`result?`, okData);
-					response.writeHead(200, {"Content-Type": "application/json"});
-					response.end();
-				}).catch(function(errData) {
-					console.log('ERROR', errData);
-					response.writeHead(503, {"Content-Type": "application/json"});
-					var error = {
-						message: errData
-					};
-					response.write(JSON.stringify(error));
-					response.end();
-				});
+				var imageContent = dataJSON.image;
+				var buffer = Buffer.from(imageContent, 'base64');
+				// console.log('image content', imageContent);
+				// console.log('buffer', buffer);
+				var filePath = `static/images/${userId}/`;
+				if (! fs.existsSync(filePath)) {
+					fs.mkdirSync(filePath)
+				}
+
+				filePath = filePath + dataJSON.title;
+				
+				fs.writeFile(filePath, buffer, 'binary', function(err) {
+					if (err) {
+						response.writeHead(401, { "Content-Type": "application/json" });
+						response.write(JSON.stringify({ error: err }));
+						response.end();
+					} else {
+						Item.create({
+							title:    dataJSON.title,
+							filepath: filePath
+						}).then(function(okData) {
+							console.log(`result?`, okData);
+							response.writeHead(200, {"Content-Type": "application/json"});
+							response.end();
+						}).catch(function(errData) {
+							console.log('ERROR', errData);
+							response.writeHead(503, {"Content-Type": "application/json"});
+							var error = {
+								message: errData
+							};
+							response.write(JSON.stringify(error));
+							response.end();
+						});
+					}
+				});	
 			},
 			function(error) {
 				response.writeHead(401, { "Content-Type": "application/json" });

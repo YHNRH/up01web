@@ -147,22 +147,29 @@ function readDataFromRequest(request, callback) {
  */
 function create(request, response){
 	readDataFromRequest(request, function(dataJSON) {
-		Item.create({
-			title: dataJSON.title,
-			filepath: dataJSON.filepath
-		}).then(function(okData) {
-			console.log(`result?`, okData);
-			response.writeHead(200, {"Content-Type": "application/json"});
-			response.end();
-		}).catch(function(errData) {
-			console.log('ERROR', errData);
-			response.writeHead(503, {"Content-Type": "application/json"});
-			var error = {
-				message: errData
-			};
-			response.write(JSON.stringify(error));
-			response.end();
-		});
+		authorize(dataJSON.token, function(userId) {
+				Item.create({
+					title: dataJSON.title,
+					filepath: dataJSON.filepath
+				}).then(function(okData) {
+					console.log(`result?`, okData);
+					response.writeHead(200, {"Content-Type": "application/json"});
+					response.end();
+				}).catch(function(errData) {
+					console.log('ERROR', errData);
+					response.writeHead(503, {"Content-Type": "application/json"});
+					var error = {
+						message: errData
+					};
+					response.write(JSON.stringify(error));
+					response.end();
+				});
+			},
+			function(error) {
+				response.writeHead(401, { "Content-Type": "application/json" });
+				response.write(JSON.stringify({ error: error }));
+				response.end();
+			});
 	});
 }
 

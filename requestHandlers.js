@@ -223,7 +223,7 @@ function register(request, response) {
 	});
 }
 
-function auth(request, response) {
+function login(request, response) {
 	var body = [];
 	request.on('data', function(chunk) {
 		body.push(chunk);
@@ -310,7 +310,7 @@ exports.getList  = getList;
 exports.create   = create;
 exports.remove   = remove;
 exports.register = register;
-exports.auth     = auth;
+exports.login    = login;
 exports.logout   = logout;
 exports.authCreateTestData = authCreateTestData;
 exports.authRemoveTestData = authRemoveTestData;

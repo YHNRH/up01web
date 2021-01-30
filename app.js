@@ -11,7 +11,5 @@ handlers['/api/remove']   = requestHandlers.remove;
 handlers['/api/register'] = requestHandlers.register;
 handlers['/api/login']    = requestHandlers.login;
 handlers['/api/logout']   = requestHandlers.logout;
-handlers['/api/test-auth-create']   = requestHandlers.authCreateTestData; // удалить после релиза
-handlers['/api/test-auth-remove']   = requestHandlers.authRemoveTestData; // удалить после релиза
 
 server.start(router.route, handlers);

@@ -148,58 +148,6 @@ function remove(request, response) {
 	});
 }
 
-/**
- * Функция создания тестовых данных для тестирования аутентификации (удалить после релиза)
- */
-function authCreateTestData(request, response) {
-	User.create({
-			login: 'vasya',
-			pass: '123321',
-			access: 1
-		}).then(function(okData) {
-
-			var userId=okData.dataValues.id;
-			var login=okData.dataValues.login;
-			var tokenTTL = 60; // min
-			var today = Date.now();
-			var expire = today + tokenTTL * 60 * 1000;
-
-			Token.create({
-				userId: userId,
-				expire: expire
-			}).then(function(okData) {
-				response.writeHead(201, {"Content-Type": "application/json"});
-				response.write(JSON.stringify({login:login, token: okData.dataValues.id}));
-				response.end();
-			}).catch(function(errData) {
-				response.writeHead(503, {"Content-Type": "application/json"});
-				var error = {
-					message: errData
-				};
-				response.write(JSON.stringify(error));
-				response.end();
-			});
-
-		}).catch(function(errData) {
-			response.writeHead(503, {"Content-Type": "application/json"});
-			var error = {
-				message: errData
-			};
-			response.write(JSON.stringify(error));
-			response.end();
-		});
-}
-
-/**
- * Функция удаления тестовых данных для тестирования аутентификации (удалить после релиза)
- */
-function authRemoveTestData(request, response) {
-	User.destroy({truncate: true});
-	Token.destroy({truncate: true});
-	response.writeHead(204, {"Content-Type": "application/json"});
-	response.end();
-}
-
 function register(request, response) {
 	var body = [];
 	request.on('data', function(chunk) {
@@ -312,5 +260,3 @@ exports.remove   = remove;
 exports.register = register;
 exports.login    = login;
 exports.logout   = logout;
-exports.authCreateTestData = authCreateTestData;
-exports.authRemoveTestData = authRemoveTestData;

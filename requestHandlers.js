@@ -200,8 +200,32 @@ function authRemoveTestData(request, response) {
 	response.end();
 }
 
-exports.getList = getList;
-exports.create  = create;
-exports.remove  = remove;
+function register(request, response) {
+	var body = [];
+	request.on('data', function(chunk) {
+		body.push(chunk);
+	}).on('end', function() {
+		body = body.join('');
+		var dataJSON = JSON.parse(body);
+		User.create({
+			login:  dataJSON.login,
+			pass:   dataJSON.password,
+			access: 1
+		}).then(function (okData) {
+			response.writeHead(204, {"Content-Type": "application/json"});
+			response.end();
+		}).catch(function (errData) {
+			response.writeHead(503, {"Content-Type": "application/json"});
+			var result = { message: "Could not create user." };
+			response.write(JSON.stringify(result));
+			response.end();
+		})
+	});
+}
+
+exports.getList  = getList;
+exports.create   = create;
+exports.remove   = remove;
+exports.register = register;
 exports.authCreateTestData = authCreateTestData;
 exports.authRemoveTestData = authRemoveTestData;

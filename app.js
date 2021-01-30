@@ -8,6 +8,7 @@ var handlers = {};
 handlers['/api/get-list'] = requestHandlers.getList;
 handlers['/api/create']   = requestHandlers.create;
 handlers['/api/remove']   = requestHandlers.remove;
+handlers['/api/register'] = requestHandlers.register;
 handlers['/api/test-auth-create']   = requestHandlers.authCreateTestData; // удалить после релиза
 handlers['/api/test-auth-remove']   = requestHandlers.authRemoveTestData; // удалить после релиза
 

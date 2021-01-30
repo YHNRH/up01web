@@ -271,10 +271,46 @@ function auth(request, response) {
 	});
 }
 
+function logout(request, response) {
+	var body = [];
+	request.on('data', function(chunk) {
+		body.push(chunk);
+	}).on('end', function() {
+		body = body.join('');
+		var dataJSON = JSON.parse(body);
+		var token = dataJSON.token;
+		Token.findAll({
+			where : {
+				id: token
+			}
+		}).then(function(data) {
+			if (data.length > 0) {
+				Token.destroy({
+					where: {
+						id: token
+					}
+				}).then(function (data) {
+					response.writeHead(204, {"Content-Type": "application/json"});
+					response.end();
+				});
+			} else {
+				response.writeHead(401, {"Content-Type": "application/json"});
+				response.write(JSON.stringify({ message: "Not authorized." }));
+				response.end();
+			}
+		}).catch(function (error) {
+			response.writeHead(503, {"Content-Type": "application/json"});
+			response.write(JSON.stringify({ message: "Database error." }));
+			response.end();
+		});
+	});
+}
+
 exports.getList  = getList;
 exports.create   = create;
 exports.remove   = remove;
 exports.register = register;
 exports.auth     = auth;
+exports.logout   = logout;
 exports.authCreateTestData = authCreateTestData;
 exports.authRemoveTestData = authRemoveTestData;

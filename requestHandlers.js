@@ -93,7 +93,6 @@ function authorize(token, successCallback, errorCallback) {
 	}
 }
 
-
 /**
  * getting list items from database and return it as JSON to frontend 
  */
@@ -132,7 +131,12 @@ function readDataFromRequest(request, callback) {
 	request.on('data', function(chunk) {
 		body.push(chunk);
 	}).on('end', function() {
-		body = body.join('');
+		if (body.length == 0) {
+			body = '{}';
+		} else {
+			body = body.join('');
+		}
+		console.log('body', body);
 		var dataJSON = JSON.parse(body);
 		callback(dataJSON);
 	});

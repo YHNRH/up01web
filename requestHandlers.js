@@ -100,7 +100,7 @@ function authorize(token, successCallback, errorCallback) {
  */
 function getList(request, response){
 	readDataFromRequest(request, function(dataJSON) {
-		authorize(dataJSON.token, function(userId) {
+		authorize(request.headers.token, function(userId) {
 			Item.findAll({}).then(function(data) {
 				var result = [];
 				data.forEach(function (e) {
@@ -149,7 +149,7 @@ function readDataFromRequest(request, callback) {
  */
 function create(request, response){
 	readDataFromRequest(request, function(dataJSON) {
-		authorize(dataJSON.token, function(userId) {
+		authorize(request.headers.token, function(userId) {
 				var imageContent = dataJSON.image;
 				var buffer = Buffer.from(imageContent, 'base64');
 				// console.log('image content', imageContent);
@@ -199,7 +199,7 @@ function create(request, response){
  */
 function remove(request, response) {
 	readDataFromRequest(request, function (dataJSON) {
-		authorize(dataJSON.token, function(userId) {
+		authorize(request.headers.token, function(userId) {
 				console.log('DATA', dataJSON);
 				var ids = dataJSON.ids;
 				ids.forEach(function(id) {

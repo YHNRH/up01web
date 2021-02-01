@@ -80,9 +80,16 @@ function refresh(inputData){
 }
 
 function downloadDataFromServer(){
+	// localStorage.setItem('token', 'value');
+	// localStorage.removeItem('token');
+	var token = localStorage.getItem('token');
 	var listTableBody = document.getElementById('list-table-body');
 	listTableBody.innerHTML = `<tr><td colspan=3>Please wait... Loading....</td></tr>`;
-	fetch(`/api/get-list`).then(function(response){
+	fetch(`/api/get-list`, {
+		headers: {
+			'token': token
+		}
+	}).then(function(response){
 		if(response.ok){
 			response.json().then(function(data){
 				refresh(data);

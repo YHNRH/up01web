@@ -1,3 +1,6 @@
+// https://learn.javascript.ru/promise-basics
+// https://learn.javascript.ru/async-await
+
 async function login(){
 	try {
 		document.getElementById("app").innerHTML = await new Promise(function(resolve){
@@ -19,12 +22,48 @@ async function login(){
 }
 
 function list(){
-	document.getElementById("app").innerHTML=''; // ??	
-	downloadDataFromServer();
+
+	try {
+		document.getElementById("app").innerHTML = await new Promise(function(resolve){
+			fetch(`/views/view-list.html`).then(function(response){
+				if(response.ok){
+					response.text().then(function(data){
+						resolve(data);
+					});
+				} else {
+					resolve('ERROR DETECTED');
+				}
+			}).catch(function(error){
+				resolve('ERROR DETECTED ' + error);
+			});
+		});
+
+		downloadDataFromServer();
+
+	} catch(e){
+		//
+	}
+	
 }
 
 function help(){
-	document.getElementById("app").innerHTML=''; // ??
+	try {
+		document.getElementById("app").innerHTML = await new Promise(function(resolve){
+			fetch(`/views/view-help.html`).then(function(response){
+				if(response.ok){
+					response.text().then(function(data){
+						resolve(data);
+					});
+				} else {
+					resolve('ERROR DETECTED');
+				}
+			}).catch(function(error){
+				resolve('ERROR DETECTED ' + error);
+			});
+		});
+	} catch(e){
+		//
+	}
 }
 
 function refresh(inputData){

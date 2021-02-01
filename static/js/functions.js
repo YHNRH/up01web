@@ -21,7 +21,7 @@ async function login(){
 	}
 }
 
-function list(){
+async function list(){
 
 	try {
 		document.getElementById("app").innerHTML = await new Promise(function(resolve){
@@ -46,7 +46,7 @@ function list(){
 	
 }
 
-function help(){
+async function help(){
 	try {
 		document.getElementById("app").innerHTML = await new Promise(function(resolve){
 			fetch(`/views/view-help.html`).then(function(response){

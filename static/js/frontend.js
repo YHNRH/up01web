@@ -18,3 +18,7 @@ function router(state){
 
 window.addEventListener('popstate', router);
 window.addEventListener('load', router);
+window.addEventListener('load', function(){
+	var btnLogout = document.getElementById('btn-logout');
+	btnLogout.addEventListener('click', doLogout);
+});

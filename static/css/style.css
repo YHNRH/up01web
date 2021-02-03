@@ -38,17 +38,58 @@ body {
 }
 
 #table-menu .c2 {
-	width: 110px;
+	
 }
-
-#table-menu .c3 {
-	text-align: center;
-}
-<<<<<<< HEAD
 
 div.error {
 	color: red;
 	font-weight: bold;
 }
-=======
->>>>>>> e222e5ee068a1a294a8be23093738c9e2fb51920
+
+#modal-dialog {
+    background: #312e2eab;
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    z-index: 500;
+    padding: 30%;
+}
+
+.hide {
+	display: none;
+}
+
+.show {
+	display: block;
+}
+
+#modal-dialog .content {
+	background-color: whitesmoke;
+	width: 100%;
+	min-height: 400px;
+	border: 3px solid cyan;
+	border-radius: 8px;
+	padding: 8px;
+}
+
+#modal-dialog-close-btn {
+    background: red;
+    width: 25px;
+    height: 25px;
+    text-align: center;
+    padding-top: 4px;
+    font-family: mono;
+    float: right;
+    border-radius: 4px;
+}
+
+#modal-dialog-img{
+	width: 100%;
+}
+
+#modal-dialog-title{
+	font-weight: bold;
+	float: left;
+}

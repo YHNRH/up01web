@@ -5,33 +5,21 @@
   "main": "app.js",
   "scripts": {
     "start": "node app.js",
-<<<<<<< HEAD
     "start-dev": "nodemon app.js",
     "auth-create": "curl http://localhost:8888/api/test-auth-create",
     "auth-remove": "curl http://localhost:8888/api/test-auth-remove",
-=======
->>>>>>> e222e5ee068a1a294a8be23093738c9e2fb51920
     "ts": "./node_modules/http-server/bin/http-server",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
     "type": "git",
-<<<<<<< HEAD
-    "url": "https://gitlab.nntc.nnov.ru/v.slugin/up01web.git"
-  },
-  "author": "Vladimir G. Slugin",
-  "license": "ISC",
-  "devDependencies": {
-    "http-server": "^0.12.3",
-    "nodemon": "^2.0.7"
-=======
-    "url": "https://gitlab.nntc.nnov.ru/lastik13373/up01web"
+    "url": "https://gitlab.nntc.nnov.ru/lastik13373/up01web.git"
   },
   "author": "Semerikov G. V.",
   "license": "ISC",
   "devDependencies": {
-    "http-server": "^0.12.3"
->>>>>>> e222e5ee068a1a294a8be23093738c9e2fb51920
+    "http-server": "^0.12.3",
+    "nodemon": "^2.0.7"
   },
   "dependencies": {
     "mariadb": "^2.5.2",

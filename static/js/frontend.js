@@ -9,7 +9,8 @@ function router(state){
 	if ((typeof handlers[route]) === 'function') {
 		handlers[route]();
 	} else {
-		handlers['login']();
+		document.location.hash='#login';
+
 	}
 }
 

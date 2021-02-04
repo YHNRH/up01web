@@ -1,9 +1,10 @@
 let { Sequelize, Model, DataTypes } = require('sequelize');
 
-let sequelize = new Sequelize('db', 'root', '123456', 
+let sequelize = new Sequelize('db', 'user', '123456', 
 	{ host: 'localhost', dialect: 'mariadb' });
 
 let fs = require('fs');
+var url = require("url");
 
 /**
  * Item Model - begin
@@ -69,6 +70,76 @@ Token.sync(); // { force: true }
  * Token Model - end
  */
 
+
+ function createArchiveAndGetItPath(ids){
+ 	var filepath = `${__dirname}/files.zip`;
+ 	return filepath;
+ }
+
+function download(request, response) {
+ 	authorize(request.headers.token, function(userId) {
+
+ 		var query = url.parse(request.url).query;
+ 		var ids = query.replace(/^ids=/, '').split('%2C');
+ 		
+ 		var filePath = createArchiveAndGetItPath(ids);
+		var stat = fs.statSync(filePath);
+
+ 		response.writeHead(200, {
+                'Content-Type': 'application/zip',
+                'Content-Length': stat.size
+            });
+
+ 		var readStream = fs.createReadStream(filePath);
+
+ 		readStream.on('open', function() {
+ 			readStream.pipe(response);
+ 		});
+
+ 		readStream.on('error', function(err) {
+                response.end(err);
+        });
+ 	},
+ 	function(error) {
+ 		response.writeHead(401, { "Content-Type": "application/json" });
+ 		response.write(JSON.stringify({ error: error }));
+ 		response.end();
+ 	});
+ }
+
+
+
+function myauthorize(request, response) {
+ 	console.log("MAKE authorize token?", request);
+ 	var token = request.headers.token;
+ 	if (token == undefined) {
+ 		response.writeHead(404, { "Content-Type": "application/json" });
+ 		response.end();
+ 	} else {
+ 		Token.findAll({
+ 			where : {
+ 				id: token
+ 			}
+ 		}).then(function (tokens) {
+ 			if (tokens.length > 0) {
+ 				response.writeHead(200, { "Content-Type": "application/json" });
+ 				response.end();
+ 			} else {
+ 				response.writeHead(401, { "Content-Type": "application/json" });
+ 				response.end();
+ 			}
+ 		}).catch(function (error) {
+ 				response.writeHead(503, { "Content-Type": "application/json" });
+ 				response.end();
+ 		});
+ 	}
+ }
+
+
+
+
+
+
 /**
  * Функция авторизации пользователя.
  * successCallback вызывается при успешной авторизации с ID пользователя.
@@ -94,6 +165,7 @@ Token.sync(); // { force: true }
  		});
  	}
  }
+
 
 /**
  * getting list items from database and return it as JSON to frontend 
@@ -257,28 +329,27 @@ Token.sync(); // { force: true }
 /**
  * Функция обработки операции удаления записи из БД.
  */
- function remove(request, response) {
- 	readDataFromRequest(request, function (dataJSON) {
- 		authorize(request.headers.token, function(userId) {
- 			console.log('DATA', dataJSON);
- 			var ids = dataJSON.ids;
- 			ids.forEach(function(id) {
- 				Item.destroy({
- 					where: {
- 						id: id
- 					}
- 				})
- 			});
- 			response.writeHead(204, {"Content-Type": "application/json"});
- 			response.end();
- 		},
- 		function(error) {
- 			response.writeHead(401, { "Content-Type": "application/json" });
- 			response.write(JSON.stringify({ error: error }));
- 			response.end();
+function remove(request, response) {
+ 	authorize(request.headers.token, function(userId) {
+ 		var query = url.parse(request.url).query;
+ 		var ids = query.replace(/^ids=/, '').split('%2C');
+ 		ids.forEach(function(id) {
+ 			Item.destroy({
+ 				where: {
+ 					id: id
+ 				}
+ 			})
  		});
+ 		response.writeHead(204, {"Content-Type": "application/json"});
+ 		response.end();
+ 	},
+ 	function(error) {
+ 		response.writeHead(401, { "Content-Type": "application/json" });
+ 		response.write(JSON.stringify({ error: error }));
+ 		response.end();
  	});
  }
+
 
  function register(request, response) {
  	readDataFromRequest(request, function(dataJSON) {
@@ -375,4 +446,6 @@ Token.sync(); // { force: true }
  exports.remove   = remove;
  exports.register = register;
  exports.login    = login;
+ exports.download = download;
  exports.logout   = logout;
+ exports.myauthorize = myauthorize;

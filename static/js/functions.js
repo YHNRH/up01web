@@ -1,3 +1,20 @@
+	function downloadFile(data, filename, type) {
+		var file = new Blob([data], {type: type});
+	    if (window.navigator.msSaveOrOpenBlob) // IE10+
+	    	window.navigator.msSaveOrOpenBlob(file, filename);
+	    else { // Others
+	    	var a = document.createElement("a"),
+	    	url = URL.createObjectURL(file);
+	    	a.href = url;
+	    	a.download = filename;
+	    	document.body.appendChild(a);
+	    	a.click();
+	    	setTimeout(function() {
+	    		document.body.removeChild(a);
+	    		window.URL.revokeObjectURL(url);  
+	    	}, 0); 
+	    }
+	}
 
 function doLoginIsValidForm(login, password){
 
@@ -93,12 +110,29 @@ async function doLogout(){
 	if(logoutResult.status === 'success'){
 		localStorage.removeItem('token');
 		localStorage.removeItem('login');
-		document.getElementById('login-form-errors').innerHTML = '';
+		//document.getElementById('login-form-errors').innerHTML = '';
 		document.location.hash='#login';
 	}
 }
 
 async function login(){
+	var debug =0;
+	var token = localStorage.getItem('token');
+		await fetch('/api/myauthorize', {
+			headers: {
+				'Content-Type': 'application/json;charset=utf-8',
+				'token': token
+			}
+		}).then(function(response){
+			if(response.ok){
+			document.location.hash = '#list';
+			debug = 1;
+			} else {
+			}
+		}).catch(function(error){
+			console.log(error);
+		});
+		if (debug===0){
 	try {
 		document.getElementById("app").innerHTML = await new Promise(function(resolve){
 			fetch(`/views/view-login.html`).then(function(response){
@@ -125,16 +159,15 @@ async function login(){
 		
 	} catch(e){
 	//
-}
+}}
 }
 
 async function list(){
-
 	try {
-		document.getElementById("app").innerHTML = await new Promise(function(resolve){
+		 document.getElementById("app").innerHTML =  await new Promise(function(resolve){
 			fetch(`/views/view-list.html`).then(function(response){
 				if(response.ok){
-					response.text().then(function(data){
+						response.text().then(function(data){
 						resolve(data);
 					});
 				} else {
@@ -146,10 +179,12 @@ async function list(){
 		});
 
 		if(document.location.hash === '#list'){
+			console.log('chek hash');
 			downloadDataFromServer();
 		}
 
 	} catch(e){
+		console.log(e);
 	//
 }
 
@@ -183,7 +218,7 @@ function showImageInModal(filePath, fileTitle){
 	var dlgTitle = document.getElementById('modal-dialog-title');
 
 	dlgTitle.innerHTML = fileTitle;
-	dlgImg.setAttribute('src', filePath);
+	dlgImg.setAttribute('src', filePath+'/'+fileTitle);
 
 	console.log('classList before?', dlg.classList);
 	dlg.classList.remove('hide');
@@ -222,6 +257,23 @@ function refresh(inputData){
 		btn.removeEventListener('click', clickHandler); // удаляем
 		btn.addEventListener('click', clickHandler); // регистрируем заново
 	}
+function downloadFile(data, filename, type) {
+		var file = new Blob([data], {type: type});
+	    if (window.navigator.msSaveOrOpenBlob) // IE10+
+	    	window.navigator.msSaveOrOpenBlob(file, filename);
+	    else { // Others
+	    	var a = document.createElement("a"),
+	    	url = URL.createObjectURL(file);
+	    	a.href = url;
+	    	a.download = filename;
+	    	document.body.appendChild(a);
+	    	a.click();
+	    	setTimeout(function() {
+	    		document.body.removeChild(a);
+	    		window.URL.revokeObjectURL(url);  
+	    	}, 0); 
+	    }
+	}
 
 	// отобрать форму пакетной обработки данных
 	var batchActionsForm = document.getElementById('batch-actions-form');
@@ -256,36 +308,38 @@ function refresh(inputData){
 
 		switch (action){
 			case 'delete':
-				var url = new URL(`${baseUrl}/api/remove`);
-				url.searchParams.set('ids', batchIds);
-				fetch(url.toString(), {
-					method: 'delete',
-					headers: {
-						'token': token
-					}
-				}).then(function(response){
-					if(response.ok){
-						refresh(data);
-					} else {
-						var notOkResponse = `${response.status} ${response.statusText}`;
-						alert(notOkResponse);
-					}
-				}).catch(function(error){
-					alert('Network Error');
-				});
+			var url = new URL(`${baseUrl}/api/remove`);
+			url.searchParams.set('ids', batchIds);
+			fetch(url.toString(), {
+				method: 'delete',
+				headers: {
+					'token': token
+				}
+			}).then(function(response){
+				if(response.ok){
+					list();
+				} else {
+					var notOkResponse = `${response.status} ${response.statusText}`;
+					alert(notOkResponse);
+				}
+			}).catch(function(error){
+				alert('Network Error');
+			});
 			
 			break;
 
 			case 'download':
-				var url = new URL(`${baseUrl}/api/download`);
-				url.searchParams.set('ids', batchIds);
-				fetch(url.toString(), {
-					headers: {
-						'token': token
-					}
-				}).then(function(response){
-					if(response.ok){
-						refresh(data);
+			var url = new URL(`${baseUrl}/api/download`);
+			url.searchParams.set('ids', batchIds);
+			fetch(url.toString(), {
+				headers: {
+					'token': token
+				}
+			}).then(function(response){
+				if(response.ok){
+						response.blob().then(function(fileData){
+							downloadFile(fileData, 'example.zip', 'application/zip');
+						});
 					} else {
 						var notOkResponse = `${response.status} ${response.statusText}`;
 						alert(notOkResponse);
@@ -293,19 +347,20 @@ function refresh(inputData){
 				}).catch(function(error){
 					alert('Network Error');
 				});
-			break;
+				break;
 
-			case 'select':
+				case 'select':
 				alert('Не выбрано действие');
-			break;
-		}
+				break;
+			}
 
-	}
+		}
 
 	// удалить существующий слушатель события отправки формы и зарегистрировать его заново
 	batchActionsForm.removeEventListener('submit', submitHandler);
 	batchActionsForm.addEventListener('submit', submitHandler);
 }
+
 
 function downloadDataFromServer(){
     // localStorage.setItem('token', 'value');

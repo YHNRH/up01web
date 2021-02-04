@@ -1,9 +1,10 @@
 let { Sequelize, Model, DataTypes } = require('sequelize');
 
-let sequelize = new Sequelize('db', 'user', '123456', 
+let sequelize = new Sequelize('db', 'root', '123456', 
 	{ host: 'localhost', dialect: 'mariadb' });
 
 let fs = require('fs');
+const archiver = require('archiver');
 var url = require("url");
 
 /**
@@ -71,19 +72,52 @@ Token.sync(); // { force: true }
  */
 
 
- function createArchiveAndGetItPath(ids){
- 	var filepath = `${__dirname}/files.zip`;
+ async function createArchiveAndGetItPath(ids){
+ 	const output = fs.createWriteStream(__dirname + '/pics.zip');
+	const archive = archiver('zip', {
+	  zlib: { level: 9 }
+	});
+	archive.pipe(output);
+
+	var items = await new Promise (async function (resolve){
+		var items = [];
+		console.log('ids: ', ids, ids.length);
+		await Item.findAll({
+ 			where : {
+ 				id: ids
+ 			}
+ 		}).then(function (item) {
+ 			item.forEach(function(e){
+				items.push(e);
+ 			})
+  		}).catch(function (error) {
+ 			console.log(error);
+ 		});
+		resolve(items);
+	});
+	
+	console.log('items :',items, items.length);
+	items.forEach(function (item)
+	{
+			var file = __dirname + '/static' + item.dataValues.filepath + '/' + item.dataValues.title;
+ 			console.log(file);
+ 			archive.append(fs.createReadStream(file), { name: item.dataValues.title });
+						
+ 	
+	});
+	archive.finalize();
+ 	var filepath = `${__dirname}/pics.zip`;
  	return filepath;
  }
 
 function download(request, response) {
- 	authorize(request.headers.token, function(userId) {
+ 	authorize(request.headers.token, async function(userId) {
 
  		var query = url.parse(request.url).query;
  		var ids = query.replace(/^ids=/, '').split('%2C');
  		
- 		var filePath = createArchiveAndGetItPath(ids);
-		var stat = fs.statSync(filePath);
+ 		var filePath = await createArchiveAndGetItPath(ids);
+		var stat = await fs.statSync(filePath);
 
  		response.writeHead(200, {
                 'Content-Type': 'application/zip',

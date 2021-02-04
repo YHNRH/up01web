@@ -18,6 +18,7 @@
   "author": "Semerikov G. V.",
   "license": "ISC",
   "devDependencies": {
+    "archiver": "^5.2.0",
     "http-server": "^0.12.3",
     "nodemon": "^2.0.7"
   },
